@@ -38,7 +38,7 @@ const (
 		}
 	`
 
-	// Note: Keys MUST be sorted alphabetically
+	// Note: Keys MUST be sorted alphabetically.
 	testAccTomlFileDataSourceExpectedOutput = `
 		{
           "name": "go-toml",
@@ -74,7 +74,7 @@ func TestAccTomlFileDataSource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
-			// Read testing
+			// Read testing.
 			{
 				Config: testAccTomlFileDataSourceConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
