@@ -15,14 +15,6 @@ import (
 
 const (
 	testAccTomlFileDataSourceConfig = `
-	    terraform {
-		  required_providers {
-		    toml = {
-			  source = "registry.terraform.io/tobotimus/toml"
-		    }
-		  }
-	    }
-
 		data "toml_file" "file" {
 		  input = <<EOF
 		version = 2
