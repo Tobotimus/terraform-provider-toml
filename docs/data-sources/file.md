@@ -21,7 +21,7 @@ data "toml_file" "example" {
 }
 
 output "toml_file_content" {
-  value = jsondecode(data.toml_file.example.content_json)
+  value = data.toml_file.example.content
 }
 ```
 
@@ -34,5 +34,6 @@ output "toml_file_content" {
 
 ### Read-Only
 
-- `content_json` (String) JSON-encoded content of the TOML file.
+- `content` (Dynamic) Decoded content of the TOML file.
+- `content_json` (String, Deprecated) JSON-encoded content of the TOML file.
 - `id` (String) The hexadecimal encoding of the SHA1 checksum of the JSON-encoded content.

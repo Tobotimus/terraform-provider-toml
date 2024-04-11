@@ -1,0 +1,8 @@
+version = 2
+name = "go-toml"
+tags = ["go", "toml"]
+
+[section.subsection]
+items = [
+    {include = "something"}
+]
