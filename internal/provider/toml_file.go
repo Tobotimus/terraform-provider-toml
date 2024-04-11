@@ -34,10 +34,7 @@ func (d *tomlfileDataSource) Metadata(_ context.Context, req datasource.Metadata
 // Schema defines the schema for the data source.
 func (d *tomlfileDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "The `toml_file` data source allows Terraform to parse TOML file content as a data source.\n\n" +
-			"Note that the content is returned in `content_json` as a JSON-encoded string. You can then use " +
-			"the `jsondecode()` function to access fields within the TOML file. This oddity is due to a current " +
-			"limitation in the Terraform Plugin Framework.",
+		Description: "The `toml_file` data source allows Terraform to parse TOML file content as a data source.",
 		Attributes: map[string]schema.Attribute{
 			"input": schema.StringAttribute{
 				Description: "Raw content of the TOML file to be parsed.",

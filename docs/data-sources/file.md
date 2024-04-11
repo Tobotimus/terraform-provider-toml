@@ -4,14 +4,11 @@ page_title: "toml_file Data Source - terraform-provider-toml"
 subcategory: ""
 description: |-
   The toml_file data source allows Terraform to parse TOML file content as a data source.
-  Note that the content is returned in content_json as a JSON-encoded string. You can then use the jsondecode() function to access fields within the TOML file. This oddity is due to a current limitation in the Terraform Plugin Framework.
 ---
 
 # toml_file (Data Source)
 
 The `toml_file` data source allows Terraform to parse TOML file content as a data source.
-
-Note that the content is returned in `content_json` as a JSON-encoded string. You can then use the `jsondecode()` function to access fields within the TOML file. This oddity is due to a current limitation in the Terraform Plugin Framework.
 
 ## Example Usage
 
