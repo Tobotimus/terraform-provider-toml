@@ -1,3 +1,10 @@
+## 0.2.1 (April 11, 2024)
+
+NOTES:
+
+* data-source/toml_file: Update documentation to remove recommendation to use `content_json` attribute.
+
+
 ## 0.2.0 (April 11, 2024)
 
 NOTES:
