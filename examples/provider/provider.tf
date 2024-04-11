@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     toml = {
-      source  = "tobotimus/docker"
+      source  = "registry.terraform.io/tobotimus/toml"
       version = ">=0.1.0"
     }
   }

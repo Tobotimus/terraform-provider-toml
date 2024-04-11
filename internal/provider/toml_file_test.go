@@ -11,6 +11,9 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/knownvalue"
+	"github.com/hashicorp/terraform-plugin-testing/statecheck"
+	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
 )
 
 const (
@@ -31,7 +34,7 @@ const (
 	`
 
 	// Note: Keys MUST be sorted alphabetically.
-	testAccTomlFileDataSourceExpectedOutput = `
+	testAccTomlFileDataSourceExpectedOutputJSON = `
 		{
           "name": "go-toml",
           "section": {
@@ -54,7 +57,7 @@ const (
 
 func TestAccTomlFileDataSource(t *testing.T) {
 	dst := &bytes.Buffer{}
-	if err := json.Compact(dst, []byte(testAccTomlFileDataSourceExpectedOutput)); err != nil {
+	if err := json.Compact(dst, []byte(testAccTomlFileDataSourceExpectedOutputJSON)); err != nil {
 		panic(err)
 	}
 	expected_content_minified := dst.String()
@@ -69,10 +72,39 @@ func TestAccTomlFileDataSource(t *testing.T) {
 			// Read testing.
 			{
 				Config: testAccTomlFileDataSourceConfig,
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.toml_file.file", "content_json", expected_content_minified),
-					resource.TestCheckResourceAttr("data.toml_file.file", "id", sha1Hex),
-				),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue(
+						"data.toml_file.file",
+						tfjsonpath.New("content"),
+						knownvalue.ObjectExact(map[string]knownvalue.Check{
+							"name": knownvalue.StringExact("go-toml"),
+							"section": knownvalue.ObjectExact(map[string]knownvalue.Check{
+								"subsection": knownvalue.ObjectExact(map[string]knownvalue.Check{
+									"items": knownvalue.ListExact([]knownvalue.Check{
+										knownvalue.ObjectExact(map[string]knownvalue.Check{
+											"include": knownvalue.StringExact("something"),
+										}),
+									}),
+								}),
+							}),
+							"tags": knownvalue.ListExact([]knownvalue.Check{
+								knownvalue.StringExact("go"),
+								knownvalue.StringExact("toml"),
+							}),
+							"version": knownvalue.Int64Exact(2),
+						}),
+					),
+					statecheck.ExpectKnownValue(
+						"data.toml_file.file",
+						tfjsonpath.New("content_json"),
+						knownvalue.StringExact(expected_content_minified),
+					),
+					statecheck.ExpectKnownValue(
+						"data.toml_file.file",
+						tfjsonpath.New("id"),
+						knownvalue.StringExact(sha1Hex),
+					),
+				},
 			},
 		},
 	})

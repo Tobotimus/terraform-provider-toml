@@ -43,9 +43,15 @@ func (d *tomlfileDataSource) Schema(_ context.Context, _ datasource.SchemaReques
 				Description: "Raw content of the TOML file to be parsed.",
 				Required:    true,
 			},
+			"content": schema.DynamicAttribute{
+				Description: "Decoded content of the TOML file.",
+				Computed:    true,
+			},
 			"content_json": schema.StringAttribute{
 				Description: "JSON-encoded content of the TOML file.",
 				Computed:    true,
+				DeprecationMessage: "The `content_json` attribute is deprecated, and will be removed in the next " +
+					"major version. Use the `content` attribute instead.",
 			},
 			"id": schema.StringAttribute{
 				Description: "The hexadecimal encoding of the SHA1 checksum of the JSON-encoded content.",
@@ -86,11 +92,18 @@ func (d *tomlfileDataSource) Read(ctx context.Context, req datasource.ReadReques
 		return
 	}
 
+	_, content_tf, diags := convertToTerraformType(decoded_content)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	sha1Sum := sha1.Sum(content_json)
 	sha1Hex := hex.EncodeToString(sha1Sum[:])
 
 	state := tomlFileDataSourceModelV0{
 		Input:       config.Input,
+		Content:     types.DynamicValue(content_tf),
 		ContentJSON: types.StringValue(string(content_json)),
 		ID:          types.StringValue(sha1Hex),
 	}
@@ -100,7 +113,8 @@ func (d *tomlfileDataSource) Read(ctx context.Context, req datasource.ReadReques
 }
 
 type tomlFileDataSourceModelV0 struct {
-	Input       types.String `tfsdk:"input"`
-	ContentJSON types.String `tfsdk:"content_json"`
-	ID          types.String `tfsdk:"id"`
+	Input       types.String  `tfsdk:"input"`
+	Content     types.Dynamic `tfsdk:"content"`
+	ContentJSON types.String  `tfsdk:"content_json"`
+	ID          types.String  `tfsdk:"id"`
 }
