@@ -1,3 +1,17 @@
+## 0.3.0 (April 13, 2024)
+
+FEATURES:
+
+* function/encode: New function, available with Terraform 1.8+, to encode a value as a string using TOML syntax.
+
+BUG FIXES:
+
+* function/decode: Fix errors when decoding date-times and dates.
+
+NOTES:
+
+* function/decode: Documentation updated to include type mapping between TOML values and Terraform language values.
+
 ## 0.2.1 (April 11, 2024)
 
 NOTES:
