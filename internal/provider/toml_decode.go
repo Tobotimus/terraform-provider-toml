@@ -3,13 +3,13 @@ package provider
 import (
 	"context"
 	"fmt"
-	"time"
-
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/function"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/pelletier/go-toml/v2"
+	"strings"
+	"time"
 )
 
 var (
@@ -28,8 +28,32 @@ func (r DecodeFunction) Metadata(_ context.Context, req function.MetadataRequest
 
 func (r DecodeFunction) Definition(_ context.Context, _ function.DefinitionRequest, resp *function.DefinitionResponse) {
 	resp.Definition = function.Definition{
-		Summary:             "Decode TOML content",
-		MarkdownDescription: "Decodes the content of a TOML file to a Terraform object.",
+		Summary: "Decode a string as TOML",
+		MarkdownDescription: strings.Join(
+			[]string{
+				"Interprets a given string as TOML, returning a representation of the ",
+				"result of decoding that string.",
+				"",
+				"The function maps TOML values to [Terraform language values](https://developer.hashicorp.com/terraform/language/expressions/types)",
+				"in the following way:",
+				"",
+				"| TOML type          | Terraform type                                             |",
+				"|--------------------|------------------------------------------------------------|",
+				"| `String`           | `string`                                                   |",
+				"| `Integer`          | `number`                                                   |",
+				"| `Float`            | `number`                                                   |",
+				"| `Boolean`          | `bool`                                                     |",
+				"| `Offset Date-Time` | `string`, in RFC 3339 format                               |",
+				"| `Local Date-Time`  | `string`, in RFC 3339 format                               |",
+				"| `Local Date`       | `string`, in RFC 3339 format                               |",
+				"| `Local Time`       | `string`, in RFC 3339 format                               |",
+				"| `Table`            | `object(...)` with element types determined per this table |",
+				"| `Inline Table`     | same as `Table`                                            |",
+				"| `Array`            | `tuple(...)` with element types determined per this table  |",
+				"| `Array of Tables`  | same as `Array` and `Table`                                |",
+			},
+			"\n",
+		),
 		Parameters: []function.Parameter{
 			function.StringParameter{
 				Name:                "input",
@@ -49,8 +73,8 @@ func (r DecodeFunction) Run(ctx context.Context, req function.RunRequest, resp *
 		return
 	}
 
-	var decoded_content any
-	err := toml.Unmarshal([]byte(data), &decoded_content)
+	var decodedContent any
+	err := toml.Unmarshal([]byte(data), &decodedContent)
 	if err != nil {
 		resp.Error = function.NewArgumentFuncError(
 			0,
@@ -59,7 +83,7 @@ func (r DecodeFunction) Run(ctx context.Context, req function.RunRequest, resp *
 		return
 	}
 
-	_, terraformValue, diags := convertToTerraformType(decoded_content)
+	_, terraformValue, diags := convertToTerraformType(decodedContent)
 
 	if diags.HasError() {
 		resp.Error = function.FuncErrorFromDiags(ctx, diags)
@@ -85,6 +109,12 @@ func convertToTerraformType(dynamicValue any) (attr.Type, attr.Value, diag.Diagn
 	case bool:
 		return types.BoolType, types.BoolValue(value), diags
 	case time.Time:
+		return types.StringType, types.StringValue(value.Format(time.RFC3339)), diags
+	case toml.LocalDateTime:
+		return types.StringType, types.StringValue(value.String()), diags
+	case toml.LocalDate:
+		return types.StringType, types.StringValue(value.String()), diags
+	case toml.LocalTime:
 		return types.StringType, types.StringValue(value.String()), diags
 	case []any:
 		elementTypes := make([]attr.Type, len(value))
@@ -94,6 +124,9 @@ func convertToTerraformType(dynamicValue any) (attr.Type, attr.Value, diag.Diagn
 			elementTypes[i] = elementType
 			elementValues[i] = elementValue
 			diags.Append(elementDiags...)
+		}
+		if diags.HasError() {
+			return nil, nil, diags
 		}
 		result, tupleDiags := types.TupleValue(elementTypes, elementValues)
 		diags.Append(tupleDiags...)
@@ -106,6 +139,9 @@ func convertToTerraformType(dynamicValue any) (attr.Type, attr.Value, diag.Diagn
 			attributeTypes[attributeName] = attributeType
 			attributeValues[attributeName] = attributeValue
 			diags.Append(attributeDiags...)
+		}
+		if diags.HasError() {
+			return nil, nil, diags
 		}
 		result, objectDiags := types.ObjectValue(attributeTypes, attributeValues)
 		diags.Append(objectDiags...)

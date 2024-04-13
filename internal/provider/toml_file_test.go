@@ -18,41 +18,41 @@ import (
 
 const (
 	testAccTomlFileDataSourceConfig = `
-		data "toml_file" "file" {
-		  input = <<EOF
-		version = 2
-		name = "go-toml"
-		tags = ["go", "toml"]
+data "toml_file" "file" {
+  input = <<EOF
+version = 2
+name = "go-toml"
+tags = ["go", "toml"]
 
-		[section.subsection]
-		items = [
-			{include = "something"}
-		]
-		EOF
+[section.subsection]
+items = [
+	{include = "something"}
+]
+EOF
 
-		}
-	`
+}
+`
 
 	// Note: Keys MUST be sorted alphabetically.
 	testAccTomlFileDataSourceExpectedOutputJSON = `
+{
+  "name": "go-toml",
+  "section": {
+	"subsection": {
+	  "items": [
 		{
-          "name": "go-toml",
-          "section": {
-            "subsection": {
-              "items": [
-                {
-                  "include": "something"
-                }
-              ]
-            }
-          },
-          "tags": [
-            "go",
-            "toml"
-          ],
-		  "version": 2
+		  "include": "something"
 		}
-	`
+	  ]
+	}
+  },
+  "tags": [
+	"go",
+	"toml"
+  ],
+  "version": 2
+}
+`
 )
 
 func TestAccTomlFileDataSource(t *testing.T) {
@@ -60,9 +60,9 @@ func TestAccTomlFileDataSource(t *testing.T) {
 	if err := json.Compact(dst, []byte(testAccTomlFileDataSourceExpectedOutputJSON)); err != nil {
 		panic(err)
 	}
-	expected_content_minified := dst.String()
+	expectedContentMinified := dst.String()
 
-	sha1Sum := sha1.Sum([]byte(expected_content_minified))
+	sha1Sum := sha1.Sum([]byte(expectedContentMinified))
 	sha1Hex := hex.EncodeToString(sha1Sum[:])
 
 	resource.Test(t, resource.TestCase{
@@ -97,7 +97,7 @@ func TestAccTomlFileDataSource(t *testing.T) {
 					statecheck.ExpectKnownValue(
 						"data.toml_file.file",
 						tfjsonpath.New("content_json"),
-						knownvalue.StringExact(expected_content_minified),
+						knownvalue.StringExact(expectedContentMinified),
 					),
 					statecheck.ExpectKnownValue(
 						"data.toml_file.file",

@@ -3,12 +3,31 @@
 page_title: "decode function - terraform-provider-toml"
 subcategory: ""
 description: |-
-  Decode TOML content
+  Decode a string as TOML
 ---
 
 # function: decode
 
-Decodes the content of a TOML file to a Terraform object.
+Interprets a given string as TOML, returning a representation of the 
+result of decoding that string.
+
+The function maps TOML values to [Terraform language values](https://developer.hashicorp.com/terraform/language/expressions/types)
+in the following way:
+
+| TOML type          | Terraform type                                             |
+|--------------------|------------------------------------------------------------|
+| `String`           | `string`                                                   |
+| `Integer`          | `number`                                                   |
+| `Float`            | `number`                                                   |
+| `Boolean`          | `bool`                                                     |
+| `Offset Date-Time` | `string`, in RFC 3339 format                               |
+| `Local Date-Time`  | `string`, in RFC 3339 format                               |
+| `Local Date`       | `string`, in RFC 3339 format                               |
+| `Local Time`       | `string`, in RFC 3339 format                               |
+| `Table`            | `object(...)` with element types determined per this table |
+| `Inline Table`     | same as `Table`                                            |
+| `Array`            | `tuple(...)` with element types determined per this table  |
+| `Array of Tables`  | same as `Array` and `Table`                                |
 
 ## Example Usage
 

@@ -49,6 +49,7 @@ func (p *TomlProvider) DataSources(ctx context.Context) []func() datasource.Data
 func (p *TomlProvider) Functions(ctx context.Context) []func() function.Function {
 	return []func() function.Function{
 		NewDecodeFunction,
+		NewEncodeFunction,
 	}
 }
 

@@ -15,24 +15,24 @@ import (
 
 // Ensure the implementation satisfies the expected interfaces.
 var (
-	_ datasource.DataSource = &tomlfileDataSource{}
+	_ datasource.DataSource = &TomlFileDataSource{}
 )
 
 // NewTomlFileDataSource is a helper function to simplify the provider implementation.
 func NewTomlFileDataSource() datasource.DataSource {
-	return &tomlfileDataSource{}
+	return &TomlFileDataSource{}
 }
 
-// tomlfileDataSource is the data source implementation.
-type tomlfileDataSource struct{}
+// TomlFileDataSource is the data source implementation.
+type TomlFileDataSource struct{}
 
 // Metadata returns the data source type name.
-func (d *tomlfileDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *TomlFileDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_file"
 }
 
 // Schema defines the schema for the data source.
-func (d *tomlfileDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *TomlFileDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Description: "The `toml_file` data source allows Terraform to parse TOML file content as a data source.",
 		Attributes: map[string]schema.Attribute{
@@ -59,8 +59,8 @@ func (d *tomlfileDataSource) Schema(_ context.Context, _ datasource.SchemaReques
 }
 
 // Read refreshes the Terraform state with the latest data.
-func (d *tomlfileDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var config tomlFileDataSourceModelV0
+func (d *TomlFileDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+	var config TomlFileDataSourceModelV0
 
 	diags := req.Config.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
@@ -68,8 +68,8 @@ func (d *tomlfileDataSource) Read(ctx context.Context, req datasource.ReadReques
 		return
 	}
 
-	var decoded_content interface{}
-	err := toml.Unmarshal([]byte(config.Input.ValueString()), &decoded_content)
+	var decodedContent interface{}
+	err := toml.Unmarshal([]byte(config.Input.ValueString()), &decodedContent)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Read TOML file data source error",
@@ -79,7 +79,7 @@ func (d *tomlfileDataSource) Read(ctx context.Context, req datasource.ReadReques
 		return
 	}
 
-	content_json, err := json.Marshal(decoded_content)
+	jsonContent, err := json.Marshal(decodedContent)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Read TOML file data source error",
@@ -89,19 +89,19 @@ func (d *tomlfileDataSource) Read(ctx context.Context, req datasource.ReadReques
 		return
 	}
 
-	_, content_tf, diags := convertToTerraformType(decoded_content)
+	_, tfContent, diags := convertToTerraformType(decodedContent)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	sha1Sum := sha1.Sum(content_json)
+	sha1Sum := sha1.Sum(jsonContent)
 	sha1Hex := hex.EncodeToString(sha1Sum[:])
 
-	state := tomlFileDataSourceModelV0{
+	state := TomlFileDataSourceModelV0{
 		Input:       config.Input,
-		Content:     types.DynamicValue(content_tf),
-		ContentJSON: types.StringValue(string(content_json)),
+		Content:     types.DynamicValue(tfContent),
+		ContentJSON: types.StringValue(string(jsonContent)),
 		ID:          types.StringValue(sha1Hex),
 	}
 
@@ -109,7 +109,7 @@ func (d *tomlfileDataSource) Read(ctx context.Context, req datasource.ReadReques
 	resp.Diagnostics.Append(diags...)
 }
 
-type tomlFileDataSourceModelV0 struct {
+type TomlFileDataSourceModelV0 struct {
 	Input       types.String  `tfsdk:"input"`
 	Content     types.Dynamic `tfsdk:"content"`
 	ContentJSON types.String  `tfsdk:"content_json"`
