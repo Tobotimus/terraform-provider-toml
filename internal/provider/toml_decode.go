@@ -28,11 +28,10 @@ func (r DecodeFunction) Metadata(_ context.Context, req function.MetadataRequest
 
 func (r DecodeFunction) Definition(_ context.Context, _ function.DefinitionRequest, resp *function.DefinitionResponse) {
 	resp.Definition = function.Definition{
-		Summary: "Decode a string as TOML",
+		Summary: "Decode TOML content",
 		MarkdownDescription: strings.Join(
 			[]string{
-				"Interprets a given string as TOML, returning a representation of the ",
-				"result of decoding that string.",
+				"Interprets a given string as TOML, returning a Terraform value.",
 				"",
 				"The function maps TOML values to [Terraform language values](https://developer.hashicorp.com/terraform/language/expressions/types)",
 				"in the following way:",

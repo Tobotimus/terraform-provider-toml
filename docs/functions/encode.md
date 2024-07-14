@@ -8,7 +8,7 @@ description: |-
 
 # function: encode
 
-Encodes a given value to string using TOML syntax.
+Encodes a Terraform value to TOML.
 
 The function maps [Terraform language values](https://developer.hashicorp.com/terraform/language/expressions/types)
 to TOML values in the following way:
@@ -29,7 +29,29 @@ Since the TOML format cannot fully represent all Terraform language types
 (and vice versa), passing the `encode` result to `decode` will not always 
 produce an identical value.
 
+## Example Usage
 
+```terraform
+resource "local_file" "my_toml_file" {
+  filename = "example.toml"
+  content = provider::toml::encode(
+    {
+      version = 2
+      name    = "go-toml"
+      tags    = ["go", "toml"]
+      section = {
+        subsection = {
+          items = [
+            {
+              include = "something"
+            },
+          ]
+        }
+      }
+    }
+  )
+}
+```
 
 ## Signature
 

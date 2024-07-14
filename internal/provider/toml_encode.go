@@ -29,7 +29,7 @@ func (r EncodeFunction) Definition(_ context.Context, _ function.DefinitionReque
 		Summary: "Encode a value to TOML syntax",
 		MarkdownDescription: strings.Join(
 			[]string{
-				"Encodes a given value to string using TOML syntax.",
+				"Encodes a Terraform value to TOML.",
 				"",
 				"The function maps [Terraform language values](https://developer.hashicorp.com/terraform/language/expressions/types)",
 				"to TOML values in the following way:",

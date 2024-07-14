@@ -3,13 +3,12 @@
 page_title: "decode function - terraform-provider-toml"
 subcategory: ""
 description: |-
-  Decode a string as TOML
+  Decode TOML content
 ---
 
 # function: decode
 
-Interprets a given string as TOML, returning a representation of the 
-result of decoding that string.
+Interprets a given string as TOML, returning a Terraform value.
 
 The function maps TOML values to [Terraform language values](https://developer.hashicorp.com/terraform/language/expressions/types)
 in the following way:
