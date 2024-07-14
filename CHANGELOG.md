@@ -1,3 +1,9 @@
+## 0.3.1 (July 15, 2024)
+
+NOTES:
+
+* Minor documentation improvements. 
+
 ## 0.3.0 (April 13, 2024)
 
 FEATURES:
