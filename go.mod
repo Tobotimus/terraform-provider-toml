@@ -1,8 +1,7 @@
 module terraform-provider-toml
 
 go 1.21
-
-toolchain go1.22.2
+toolchain go1.22.5
 
 require (
 	github.com/hashicorp/go-version v1.7.0
@@ -10,7 +9,7 @@ require (
 	github.com/hashicorp/terraform-plugin-framework v1.10.0
 	github.com/hashicorp/terraform-plugin-go v0.23.0
 	github.com/hashicorp/terraform-plugin-testing v1.9.0
-	github.com/pelletier/go-toml/v2 v2.2.2
+	github.com/pelletier/go-toml/v2 v2.2.3
 )
 
 require (
